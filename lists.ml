@@ -50,8 +50,7 @@ let is_palindrome list =
 ;;
 
 (* problem 7 flatten a nested list *)
-(* since there's no nested list in OCaml, we need to define one *)
-type 'a node =
+(* since there's no nested list in OCaml, we need to define one *) type 'a node =
   | One of 'a
   | Many of 'a node list
 
@@ -181,12 +180,16 @@ let drop list n =
 ;;
 
 (* problem 17 split a list into two, the length of the first part is given *)
+(* does not handle negative number *)
 let split list n =
   let rec aux acc n' = function
     | [] -> (List.rev acc, [])
-    | x :: tl -> if n' = 1 then (List.rev (x :: acc), tl) else aux (x :: acc) (n' - 1) tl
+    | x :: tl as l -> if n' = 0 then (List.rev acc, l) else aux (x :: acc) (n' - 1) tl
   in aux [] n list
 ;;
+
+let test_17_1 = split [1;2;3;4;5] 2;;
+let test_17_2 = split [1;2;3;4;5] 0;;
 
 (* Problem 18 extract a slice from a list *)
 let slice list s e =
@@ -213,7 +216,7 @@ let slice list i k =
   take (k - i + 1) (drop i list)
 ;;
 
-(* this answer can be further improved to catch the common patterns in drop and take *)
+(* the above answer can be further improved to catch the common patterns in drop and take *)
 (* I think this style is bad, the result of fold_until is hard to understand *)
 (* actually take and drop a doing totally 2 different thins *)
 let slice list i k =
@@ -230,6 +233,46 @@ let slice list i k =
 let test_18 = slice ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j"] 2 6;;
 
 (* problem 19 rotate a list N places to the left *)
-let rotate list n = []
+(* this answer uses previous helper function *)
+let rotate list n =
+  let len = length list in
+  (* make sure s is always a positive int within the length *)
+  (* also be careful about division by zero *)
+  let s = if len = 0 then 0 else (n mod len + len ) mod len in
+  let (fst, snd) = split list s in
+  snd @ fst
 ;;
 
+(* problem 20 remove the k-th element from a list (start from 0) *)
+let rec remove_at k = function
+  | [] -> []
+  | x :: tl -> if k = 0 then tl else x :: remove_at (k - 1) tl
+;;
+
+(* problem 21 insert an element at the given position *)
+let rec insert_at e k = function
+  | [] -> [e]
+  | x :: tl as l -> if k = 0 then e :: l else x :: insert_at e (k - 1) tl
+;;
+
+(* problem 22 create a list of range *)
+let rec range s e =
+  let step = if s <= e then 1 else -1 in
+  if s = e then [s] else s :: range (s + step) e
+;;
+
+(* tail recursion *)
+let range s e =
+  let l, h = if s > e then e, s else s, e in
+  let rec aux acc n =
+    if n <= h
+    then aux (n :: acc) (n + 1)
+    else acc
+  in if s > e then aux [] l else List.rev (aux [] l)
+
+(* problem 23 extract given number of randomly selected elements from a list *)
+let rand_select list n =
+  let rec get_n n = function
+    | [] -> raise Not_found
+    | x :: tl -> if n = 0 then x else get_n (n - 1) tl
+;;
