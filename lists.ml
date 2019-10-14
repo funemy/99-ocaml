@@ -271,8 +271,20 @@ let range s e =
   in if s > e then aux [] l else List.rev (aux [] l)
 
 (* problem 23 extract given number of randomly selected elements from a list *)
+(* I think this problem is ill-posed *)
 let rand_select list n =
-  let rec get_n n = function
+  (* return a tuple, the first element is the selected element *)
+  (* the second element is the rest of the list *)
+  (* but notice the rest of list is not in the same order *)
+  (* because the elements in acc is in reversed order *)
+  (* but this is still alright, because we are doing a random selection *)
+  let rec extract_n acc n = function
     | [] -> raise Not_found
-    | x :: tl -> if n = 0 then x else get_n (n - 1) tl
+    | x :: tl -> if n = 0 then (x, acc @ tl) else extract_n (x::acc) (n - 1) tl in
+  let rec aux acc n list len =
+    if n = 0 then acc
+    else let picked, rest = extract_n [] (Random.int len) list in
+      aux (picked :: acc) (n - 1) rest (len - 1) in
+  let len = List.length list in
+  aux [] n list len
 ;;
