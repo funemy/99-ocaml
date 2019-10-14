@@ -288,3 +288,25 @@ let rand_select list n =
   let len = List.length list in
   aux [] n list len
 ;;
+
+let test_23 = rand_select ["a";"b";"c";"d";"e";"f";"g";"h"] 3;;
+
+(* problem 24, draw n different random numbers from a range *)
+let lotto_select n e =
+  let list = range 1 e in
+  rand_select list n
+;;
+
+let test_24 = lotto_select 6 49;;
+
+(* probelm 25, random permutation of a list *)
+let permutation list =
+  rand_select list (List.length list)
+;;
+
+let test_25 = permutation ["a"; "b"; "c"; "d"; "e"; "f"];;
+
+(* problem 26, generate combination of k distinct objects from a list *)
+(* all subset of size K *)
+let extract n list = []
+;;
