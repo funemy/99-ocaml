@@ -299,7 +299,7 @@ let lotto_select n e =
 
 let test_24 = lotto_select 6 49;;
 
-(* probelm 25, random permutation of a list *)
+(* problem 25, random permutation of a list *)
 let permutation list =
   rand_select list (List.length list)
 ;;
@@ -308,5 +308,56 @@ let test_25 = permutation ["a"; "b"; "c"; "d"; "e"; "f"];;
 
 (* problem 26, generate combination of k distinct objects from a list *)
 (* all subset of size K *)
-let extract n list = []
+let extract_2 list =
+  let rec combine acc h = function
+    | [] -> acc
+    | x :: tl -> combine ((h :: [x]) :: acc) h tl in
+  let rec aux acc = function
+    | [] -> acc
+    | x :: tl -> let result = combine acc x tl in
+      aux result tl
+  in aux [] list
 ;;
+
+let extract n list =
+  let rec combine acc h = function
+    | [] -> acc
+    | x :: tl -> combine ((h :: x) :: acc) h tl in
+  let rec aux acc n list =
+    if n = 2 then extract_2 list
+    else match list with
+      | [] -> acc
+      | x :: tl -> let result = aux [] (n - 1) tl in
+        (combine acc x result) @ aux [] n tl
+  in List.rev (aux [] n list)
+;;
+
+(* Above is a over-complex solution *)
+(* The main thing is the extract_2 function, we can simply use List.map to achieve that *)
+(* also my previous solution has bug when n = 1*)
+(* solution below generalize n to 1 *)
+(* it's elegant but inefficient *)
+let rec extract n list =
+  (* for combine_head, each time it will return a single element wrapped with brackets [x] *)
+  if n <= 0 then [[]]
+  else
+  (* this part is almost the same as solution above *)
+  (* the remaining problem for this part is when to stop *)
+  match list with
+  | [] -> []
+  | h :: t ->
+    let combine_head = List.map (fun x -> h :: x) (extract (n - 1) t) in
+    let combine_rest = extract n t in
+    combine_head @ combine_rest
+;;
+
+let test_26_1 = extract 1 ["a";"b";"c";"d"];;
+let test_26_2 = extract 2 ["a";"b";"c";"d"];;
+let test_26_3 = extract 3 ["a";"b";"c";"d"];;
+
+(* problem 27, group the elements of a set into disjoint subsets *)
+let group list sizes =
+  let initial = List.map (fun size -> size, []) sizes in
+  let prepend
+;;
+
